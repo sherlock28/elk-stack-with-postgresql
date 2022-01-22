@@ -35,8 +35,8 @@ services:
     volumes:
       - ./localtime.buenos_aires:/etc/localtime
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      # - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-      # - ./logstash/pipeline:/usr/share/logstash/pipeline/
+      - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./logstash/pipeline:/usr/share/logstash/pipeline/
       - logstashdata:/usr/share/logstash/data/
   postgres:
     image: postgres:10.5
