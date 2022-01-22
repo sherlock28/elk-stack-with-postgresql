@@ -1,0 +1,75 @@
+version: '3.7'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3
+    container_name: elastic
+    env_file:
+      - ./elastic/elastic.env
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+      - ./localtime.buenos_aires:/etc/localtime
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+  kibana:
+    image: kibana:7.13.4
+    container_name: kibana
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTIC_HOST=http://elasticsearch:9200
+    volumes:
+      - ./localtime.buenos_aires:/etc/localtime
+  logstash:
+    image: logstash:7.13.4
+    container_name: logstash
+    user: root
+    environment: 
+      - SSL_ENABLED=false
+      - ELASTIC_HOST=http://elasticsearch:9200
+    volumes:
+      - ./localtime.buenos_aires:/etc/localtime
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      # - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      # - ./logstash/pipeline:/usr/share/logstash/pipeline/
+      - logstashdata:/usr/share/logstash/data/
+  postgres:
+    image: postgres:10.5
+    container_name: postgres
+    restart: always
+    environment: 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=dbtest
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgresql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./postgresql/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
+      - pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - 5050:80
+volumes:
+  esdata:
+  logstashdata:
+  pgdata:
+
+networks:
+  elastic:
+    driver: bridge
