@@ -1,0 +1,2 @@
+- pipeline.id: monthly_products
+  path.config: "/usr/share/logstash/pipeline/monthly_products_pipeline.conf"
