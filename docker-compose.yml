@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3
+    image: elasticsearch:7.13.4
     container_name: elastic
     env_file:
       - ./elastic/elastic.env
@@ -39,7 +39,7 @@ services:
       - ./logstash/pipeline:/usr/share/logstash/pipeline/
       - logstashdata:/usr/share/logstash/data/
   postgres:
-    image: postgres:10.5
+    image: postgres:11
     container_name: postgres
     restart: always
     environment: 
